@@ -11,8 +11,7 @@
           {{ project.get_status_display }}
         </span>
         <small class="text-muted">
-          <i class="bi bi-calendar"></i> สร้างเมื่อ {{
-          project.created_at|date:"d/m/Y H:i" }}
+          <i class="bi bi-calendar"></i> สร้างเมื่อ {{ project.created_at|date:"d/m/Y H:i" }}
         </small>
       </div>
 
@@ -27,8 +26,7 @@
         <div class="col-md-6">
           <p class="mb-2">
             <i class="bi bi-person-badge text-primary"></i>
-            <strong>อาจารย์ที่ปรึกษา:</strong> {{
-            project.advisor.get_full_name|default:"ไม่ระบุ" }}
+            <strong>อาจารย์ที่ปรึกษา:</strong> {{ project.advisor.get_full_name|default:"ไม่ระบุ" }}
           </p>
           {% if project.co_advisor %}
           <p class="mb-2">
@@ -75,8 +73,7 @@
   <ul class="nav nav-tabs mb-4" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" data-bs-toggle="tab" href="#evaluations">
-        <i class="bi bi-clipboard-check"></i> แบบประเมิน ({{ evaluations.count
-        }})
+        <i class="bi bi-clipboard-check"></i> แบบประเมิน ({{ evaluations.count }})
       </a>
     </li>
     <li class="nav-item">
