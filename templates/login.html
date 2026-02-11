@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}เข้าสู่ระบบ - ระบบจัดการโครงงาน{% endblock %}
+
+{% block extra_css %}
+<!-- Styles moved to style.css -->
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="auth-card {% if target_panel == 'admin' %}right-panel-active{% endif %}" id="authCard">
+        <div class="form-container student-container">
+            <form action="{% url 'final_pro:login' %}" method="post" class="auth-form">
+                {% csrf_token %}
+                <input type="hidden" name="target_panel" value="student">
+                <h1 class="text-primary"><i class="bi bi-mortarboard"></i> นักศึกษา</h1>
+                {% if form.is_bound and form.errors and target_panel == 'student' %}
+                    <div class="alert alert-danger py-2 w-100 small mb-2">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+                {% endif %}
+                <p class="text-muted small mb-3">เข้าใช้งานด้วยบัญชีนักศึกษา</p>
+                <input type="text" name="username" placeholder="ชื่อผู้ใช้" required>
+                <input type="password" name="password" placeholder="รหัสผ่าน" required>
+                <button type="submit" class="main-btn">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+
+        <!-- Admin/Advisor Login (Right, revealed by slide) -->
+        <div class="form-container admin-container">
+            <form action="{% url 'final_pro:login' %}" method="post" class="auth-form">
+                {% csrf_token %}
+                <input type="hidden" name="target_panel" value="admin">
+                <h1 class="text-secondary"><i class="bi bi-person-badge"></i> อาจารย์/เจ้าหน้าที่</h1>
+                {% if form.is_bound and form.errors and target_panel == 'admin' %}
+                    <div class="alert alert-danger py-2 w-100 small mb-2">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+                {% endif %}
+                <p class="text-muted small mb-3">เข้าใช้งานสำหรับผู้ประเมินและผู้ดูแลระบบ</p>
+                <input type="text" name="username" placeholder="ชื่อผู้ใช้" required>
+                <input type="password" name="password" placeholder="รหัสผ่าน" required>
+                <button type="submit" class="main-btn" style="background-color: #6c757d; border-color: #6c757d;">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+
+        <!-- Overlay Container -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <!-- Overlay panel to trigger Student view -->
+                <div class="overlay-panel overlay-left">
+                    <i class="bi bi-mortarboard display-3 mb-3"></i>
+                    <h2>สำหรับนักศึกษา?</h2>
+                    <p>สลับไปหน้านักศึกษาเพื่อส่งคำขอหรือติดตามผล</p>
+                    <button class="ghost-btn" id="studentLoginBtn">ไปหน้านักศึกษา</button>
+                </div>
+                <!-- Overlay panel to trigger Admin view -->
+                <div class="overlay-panel overlay-right">
+                    <i class="bi bi-shield-lock display-3 mb-3"></i>
+                    <h2>อาจารย์ / เจ้าหน้าที่?</h2>
+                    <p>สลับไปหน้าสำหรับอาจารย์เพื่อประเมินผลโครงงาน</p>
+                    <button class="ghost-btn" id="adminLoginBtn">ไปหน้าอาจารย์</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const studentLoginBtn = document.getElementById('studentLoginBtn');
+    const authCard = document.getElementById('authCard');
+
+    adminLoginBtn.addEventListener('click', () => {
+        authCard.classList.add("right-panel-active");
+    });
+
+    studentLoginBtn.addEventListener('click', () => {
+        authCard.classList.remove("right-panel-active");
+    });
+</script>
+{% endblock %}

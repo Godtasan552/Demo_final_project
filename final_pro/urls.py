@@ -21,6 +21,10 @@ urlpatterns = [
     path('projects/<int:project_pk>/request/',
          views.request_create, name='request_create'),
 
+    # Authentication
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+
     # Success page
     path('success/', views.submission_success, name='submission_success'),
 ]

@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from .models import Project, EvaluationForm, RequestForm, Submission
-from .forms import ProjectForm, EvaluationFormSubmission, RequestFormSubmission, SubmissionForm
+from .models import Project, EvaluationForm, RequestForm
+from .forms import ProjectForm, EvaluationFormSubmission, RequestFormSubmission
 
 # Create your views here.
 
@@ -145,6 +147,37 @@ def request_create(request, project_pk):
         'title': 'ส่งแบบคำขอ'
     }
     return render(request, 'request_form.html', context)
+
+
+def login_view(request):
+    """Custom login view with split/sliding interface logic"""
+    if request.user.is_authenticated:
+        return redirect('final_pro:home')
+
+    target_panel = request.POST.get('target_panel', 'student')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f"ยินดีต้อนรับคุณ {user.username}!")
+
+            # Use redirect to admin index if staff
+            if user.is_staff:
+                return redirect('admin:index')
+            return redirect('final_pro:home')
+        # If form is invalid, we fall through and specific errors stay in this 'form' instance
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'login.html', {'form': form, 'target_panel': target_panel})
+
+
+def logout_view(request):
+    """Logout view"""
+    logout(request)
+    messages.info(request, "ออกจากระบบเรียบร้อยแล้ว")
+    return redirect('final_pro:home')
 
 
 def submission_success(request):

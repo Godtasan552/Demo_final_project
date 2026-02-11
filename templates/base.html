@@ -77,12 +77,12 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/admin/">Admin Panel</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="#">ออกจากระบบ</a></li>
+                <li><a class="dropdown-item" href="{% url 'final_pro:logout' %}">ออกจากระบบ</a></li>
               </ul>
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="/admin/">
+              <a class="nav-link" href="{% url 'final_pro:login' %}">
                 <i class="bi bi-box-arrow-in-right"></i> เข้าสู่ระบบ
               </a>
             </li>

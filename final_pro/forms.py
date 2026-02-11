@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.models import User
 from .models import Project, EvaluationForm, RequestForm, Submission
 
 
@@ -20,6 +19,17 @@ class ProjectForm(forms.ModelForm):
             'expected_completion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('start_date')
+        expected_completion = cleaned_data.get('expected_completion')
+
+        if start_date and expected_completion:
+            if expected_completion < start_date:
+                raise forms.ValidationError(
+                    "วันที่กำหนดเสร็จต้องไม่มาก่อนวันที่เริ่มโครงงาน")
+        return cleaned_data
+
 
 class EvaluationFormSubmission(forms.ModelForm):
     """Form for submitting evaluation forms"""
@@ -34,6 +44,13 @@ class EvaluationFormSubmission(forms.ModelForm):
             'strengths': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'จุดเด่นของโครงงาน'}),
             'improvements': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'ข้อเสนอแนะในการพัฒนา'}),
         }
+
+    def clean_score(self):
+        score = self.cleaned_data.get('score')
+        if score is not None:
+            if score < 0 or score > 100:
+                raise forms.ValidationError("คะแนนต้องอยู่ระหว่าง 0 ถึง 100")
+        return score
 
 
 class RequestFormSubmission(forms.ModelForm):
