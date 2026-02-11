@@ -25,6 +25,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
+    # Export documents
+    path('projects/<int:pk>/export/<str:form_type>/',
+         views.export_project_docx, name='export_project_docx'),
+
     # Success page
     path('success/', views.submission_success, name='submission_success'),
 ]

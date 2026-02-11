@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <div class="mt-4 d-flex gap-2">
+      <div class="mt-4 d-flex gap-2 mb-4">
         <a
           href="{% url 'final_pro:evaluation_create' project.pk %}"
           class="btn btn-success"
@@ -65,6 +65,51 @@
         >
           <i class="bi bi-file-earmark-text"></i> ส่งแบบคำขอ
         </a>
+      </div>
+
+      <!-- Export Documents Section -->
+      <div class="border-top pt-4">
+        <h5 class="fw-bold mb-3 text-success">
+          <i class="bi bi-file-earmark-word"></i> พิมพ์เอกสาร (Auto-Generate)
+        </h5>
+        
+        <div class="row g-3">
+          {% if user.is_staff %}
+          <!-- Teacher Only: Evaluation Forms -->
+          <div class="col-md-12 mb-2">
+            <h6 class="text-muted small fw-bold">สำหรับอาจารย์ (แบบประเมิน)</h6>
+          </div>
+          <div class="col-md-4">
+            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.1' %}" class="btn btn-outline-success w-100 text-start">
+              <i class="bi bi-download"></i> วท.ป.1 แบบประเมินกรอบโครงงาน
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.2' %}" class="btn btn-outline-success w-100 text-start">
+              <i class="bi bi-download"></i> วท.ป.2 แบบประเมินการสอบหัวข้อ
+            </a>
+          </div>
+          <div class="col-md-4">
+            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.5' %}" class="btn btn-outline-success w-100 text-start">
+              <i class="bi bi-download"></i> วท.ป.5 แบบประเมินผลการสอบ
+            </a>
+          </div>
+          {% endif %}
+
+          <!-- Student/General: Request & Reports -->
+          <div class="col-md-12 mt-3 mb-2">
+            <h6 class="text-muted small fw-bold">สำหรับนักศึกษา/ทั่วไป (แบบคำขอ/รายงาน)</h6>
+          </div>
+          <div class="col-md-4">
+            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.รายงาน' %}" class="btn btn-outline-info w-100 text-start">
+              <i class="bi bi-download"></i> รายงานการตรวจสอบเนื้อหา (.docx)
+            </a>
+          </div>
+        </div>
+
+        <p class="small text-muted mt-3 mb-0">
+          * ระบบจะดึงข้อมูลโครงงานไปกรอกในไฟล์เทมเพลต (.docx) ให้โดยอัตโนมัติ
+        </p>
       </div>
     </div>
   </div>

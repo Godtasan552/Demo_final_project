@@ -1,10 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .models import Project, EvaluationForm, RequestForm
 from .forms import ProjectForm, EvaluationFormSubmission, RequestFormSubmission
+from .document_generator import generate_project_document
+from django.http import HttpResponse
+import os
 
 # Create your views here.
 
@@ -178,6 +182,51 @@ def logout_view(request):
     logout(request)
     messages.info(request, "ออกจากระบบเรียบร้อยแล้ว")
     return redirect('final_pro:home')
+
+
+def export_project_docx(request, pk, form_type):
+    """View to export project data to a Word document based on form type"""
+    project = get_object_or_404(Project, pk=pk)
+
+    # Map form types to file paths
+    # Note: Using r"" for windows paths or forward slashes
+    base_docs_path = os.path.join(settings.BASE_DIR, 'docs')
+
+    template_map = {
+        # แบบประเมิน
+        'วท.ป.1': os.path.join(base_docs_path, 'แบบประเมิน', 'วท.ป.1 แบบประเมินกรอบของโครงงาน.docx'),
+        'วท.ป.2': os.path.join(base_docs_path, 'แบบประเมิน', 'วท.ป.2 แบบประเมินการสอบหัวข้อโครงงาน.docx'),
+        'วท.ป.5': os.path.join(base_docs_path, 'แบบประเมิน', 'วท.ป.5 แบบประเมินผลการการสอบโครงงาน.docx'),
+
+        # แบบคำขอ (Most are .doc, only handling .docx for now with docxtpl)
+        # Still .doc
+        'วท.1': os.path.join(base_docs_path, 'แบบคำขอ', 'แบบคำขอ', 'วท.1 แบบคำขอเป็นที่ปรึกษา.doc'),
+        'วท.รายงาน': os.path.join(base_docs_path, 'แบบคำขอ', 'แบบคำขอ', 'แบบรายงานการตรวจสอบเนื้อหาโครงงาน.docx'),
+    }
+
+    template_path = template_map.get(form_type)
+
+    if not template_path:
+        messages.error(request, f"ไม่พบเทมเพลตสำหรับ {form_type}")
+        return redirect('final_pro:project_detail', pk=pk)
+
+    if not template_path.endswith('.docx'):
+        messages.error(
+            request, f"เทมเพลต {form_type} ยังเป็นไฟล์ .doc ซึ่งไม่รองรับการ Generate อัตโนมัติ (กรุณาใช้ .docx)")
+        return redirect('final_pro:project_detail', pk=pk)
+
+    try:
+        doc = generate_project_document(project, template_path)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        response['Content-Disposition'] = f'attachment; filename={form_type}_{project.id}.docx'
+
+        doc.save(response)
+        return response
+    except Exception as e:
+        messages.error(request, f"เกิดข้อผิดพลาดในการสร้างเอกสาร: {str(e)}")
+        return redirect('final_pro:project_detail', pk=pk)
 
 
 def submission_success(request):
