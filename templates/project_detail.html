@@ -1,0 +1,201 @@
+{% extends 'base.html' %} {% block title %}{{ project.title_th }}{% endblock %}
+{% block content %}
+<div class="container">
+  <!-- Project Header -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <span
+          class="badge bg-{{ project.status }}-subtle text-{{ project.status }} fs-6"
+        >
+          {{ project.get_status_display }}
+        </span>
+        <small class="text-muted">
+          <i class="bi bi-calendar"></i> สร้างเมื่อ {{
+          project.created_at|date:"d/m/Y H:i" }}
+        </small>
+      </div>
+
+      <h2 class="fw-bold mb-2">{{ project.title_th }}</h2>
+      {% if project.title_en %}
+      <h5 class="text-muted fst-italic mb-3">{{ project.title_en }}</h5>
+      {% endif %}
+
+      <p class="lead">{{ project.description }}</p>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <p class="mb-2">
+            <i class="bi bi-person-badge text-primary"></i>
+            <strong>อาจารย์ที่ปรึกษา:</strong> {{
+            project.advisor.get_full_name|default:"ไม่ระบุ" }}
+          </p>
+          {% if project.co_advisor %}
+          <p class="mb-2">
+            <i class="bi bi-person text-primary"></i>
+            <strong>อาจารย์ที่ปรึกษาร่วม:</strong> {{
+            project.co_advisor.get_full_name }}
+          </p>
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          {% if project.start_date %}
+          <p class="mb-2">
+            <i class="bi bi-calendar-check text-success"></i>
+            <strong>วันที่เริ่ม:</strong> {{ project.start_date|date:"d/m/Y" }}
+          </p>
+          {% endif %} {% if project.expected_completion %}
+          <p class="mb-2">
+            <i class="bi bi-calendar-event text-warning"></i>
+            <strong>กำหนดเสร็จ:</strong> {{
+            project.expected_completion|date:"d/m/Y" }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <a
+          href="{% url 'final_pro:evaluation_create' project.pk %}"
+          class="btn btn-success"
+        >
+          <i class="bi bi-clipboard-check"></i> ส่งแบบประเมิน
+        </a>
+        <a
+          href="{% url 'final_pro:request_create' project.pk %}"
+          class="btn btn-warning"
+        >
+          <i class="bi bi-file-earmark-text"></i> ส่งแบบคำขอ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#evaluations">
+        <i class="bi bi-clipboard-check"></i> แบบประเมิน ({{ evaluations.count
+        }})
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#requests">
+        <i class="bi bi-file-earmark-text"></i> แบบคำขอ ({{ requests.count }})
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#submissions">
+        <i class="bi bi-upload"></i> การส่งงาน ({{ submissions.count }})
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Evaluations Tab -->
+    <div id="evaluations" class="tab-pane fade show active">
+      {% if evaluations %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              <th>ผู้ประเมิน</th>
+              <th>คะแนน</th>
+              <th>สถานะ</th>
+              <th>วันที่</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for eval in evaluations %}
+            <tr>
+              <td>{{ eval.get_form_type_display }}</td>
+              <td>{{ eval.evaluator.get_full_name }}</td>
+              <td><strong>{{ eval.score|default:"-" }}</strong></td>
+              <td>
+                {% if eval.is_approved %}
+                <span class="badge bg-success">อนุมัติ</span>
+                {% else %}
+                <span class="badge bg-warning">รอดำเนินการ</span>
+                {% endif %}
+              </td>
+              <td>{{ eval.submitted_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted text-center py-4">ยังไม่มีแบบประเมิน</p>
+      {% endif %}
+    </div>
+
+    <!-- Requests Tab -->
+    <div id="requests" class="tab-pane fade">
+      {% if requests %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ประเภท</th>
+              <th>ผู้ส่ง</th>
+              <th>สถานะ</th>
+              <th>วันที่</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for req in requests %}
+            <tr>
+              <td>{{ req.get_form_type_display }}</td>
+              <td>{{ req.submitted_by.get_full_name }}</td>
+              <td>
+                <span
+                  class="badge bg-{{ req.status }}-subtle text-{{ req.status }}"
+                >
+                  {{ req.get_status_display }}
+                </span>
+              </td>
+              <td>{{ req.submitted_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted text-center py-4">ยังไม่มีแบบคำขอ</p>
+      {% endif %}
+    </div>
+
+    <!-- Submissions Tab -->
+    <div id="submissions" class="tab-pane fade">
+      {% if submissions %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>หัวข้อ</th>
+              <th>ประเภท</th>
+              <th>ผู้ส่ง</th>
+              <th>วันที่</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in submissions %}
+            <tr>
+              <td>{{ sub.title }}</td>
+              <td>{{ sub.submission_type }}</td>
+              <td>{{ sub.submitted_by.get_full_name }}</td>
+              <td>{{ sub.submitted_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted text-center py-4">ยังไม่มีการส่งงาน</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

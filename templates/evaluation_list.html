@@ -1,0 +1,82 @@
+{% extends 'base.html' %} {% block title %}รายการแบบประเมิน{% endblock %} {%
+block content %}
+<div class="container">
+  <h2 class="fw-bold mb-4">
+    <i class="bi bi-clipboard-check"></i> รายการแบบประเมินทั้งหมด
+  </h2>
+
+  <!-- Filter -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">กรองตามประเภท</label>
+          <select name="form_type" class="form-select">
+            <option value="">ทั้งหมด</option>
+            {% for value, label in form_types %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-funnel"></i> กรอง
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Evaluations Table -->
+  {% if evaluations %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>โครงงาน</th>
+              <th>ประเภท</th>
+              <th>ผู้ประเมิน</th>
+              <th>คะแนน</th>
+              <th>สถานะ</th>
+              <th>วันที่</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for eval in evaluations %}
+            <tr>
+              <td>
+                <a
+                  href="{% url 'final_pro:project_detail' eval.project.pk %}"
+                  class="text-decoration-none"
+                >
+                  {{ eval.project.title_th }}
+                </a>
+              </td>
+              <td>{{ eval.get_form_type_display }}</td>
+              <td>{{ eval.evaluator.get_full_name }}</td>
+              <td><strong>{{ eval.score|default:"-" }}</strong></td>
+              <td>
+                {% if eval.is_approved %}
+                <span class="badge bg-success">อนุมัติ</span>
+                {% else %}
+                <span class="badge bg-warning">รอดำเนินการ</span>
+                {% endif %}
+              </td>
+              <td>{{ eval.submitted_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-inbox display-1 text-muted"></i>
+    <p class="text-muted mt-3">ไม่พบแบบประเมิน</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

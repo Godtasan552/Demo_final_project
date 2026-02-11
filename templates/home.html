@@ -1,0 +1,177 @@
+{% extends 'base.html' %} {% block title %}หน้าแรก - ระบบจัดการโครงงาน{%
+endblock %} {% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-gradient text-white py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="bi bi-journal-code"></i> ระบบจัดการโครงงาน
+        </h1>
+        <p class="lead mb-4">
+          ระบบจัดการแบบฟอร์มประเมินและคำขอสำหรับโครงงานนักศึกษา
+        </p>
+        <div class="d-flex gap-3">
+          <a
+            href="{% url 'final_pro:project_create' %}"
+            class="btn btn-light btn-lg"
+          >
+            <i class="bi bi-plus-circle"></i> สร้างโครงงานใหม่
+          </a>
+          <a
+            href="{% url 'final_pro:project_list' %}"
+            class="btn btn-outline-light btn-lg"
+          >
+            <i class="bi bi-folder"></i> ดูโครงงานทั้งหมด
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center">
+        <i class="bi bi-laptop display-1"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container my-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card stat-card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon text-primary mb-3">
+            <i class="bi bi-folder-fill display-4"></i>
+          </div>
+          <h3 class="fw-bold">{{ total_projects }}</h3>
+          <p class="text-muted mb-0">โครงงานทั้งหมด</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stat-card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon text-success mb-3">
+            <i class="bi bi-clipboard-check-fill display-4"></i>
+          </div>
+          <h3 class="fw-bold">{{ total_evaluations }}</h3>
+          <p class="text-muted mb-0">แบบประเมิน</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card stat-card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon text-warning mb-3">
+            <i class="bi bi-file-earmark-text-fill display-4"></i>
+          </div>
+          <h3 class="fw-bold">{{ total_requests }}</h3>
+          <p class="text-muted mb-0">แบบคำขอ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Projects -->
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold"><i class="bi bi-clock-history"></i> โครงงานล่าสุด</h2>
+    <a
+      href="{% url 'final_pro:project_list' %}"
+      class="btn btn-outline-primary"
+    >
+      ดูทั้งหมด <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+
+  {% if projects %}
+  <div class="row g-4">
+    {% for project in projects %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card project-card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span
+              class="badge bg-{{ project.status|default:'secondary' }}-subtle text-{{ project.status|default:'secondary' }}"
+            >
+              {{ project.get_status_display }}
+            </span>
+            <small class="text-muted">
+              <i class="bi bi-calendar"></i> {{ project.created_at|date:"d/m/Y"
+              }}
+            </small>
+          </div>
+          <h5 class="card-title fw-bold mb-2">{{ project.title_th }}</h5>
+          <p class="card-text text-muted small">
+            {{ project.description|truncatewords:20 }}
+          </p>
+          <div class="mt-3 pt-3 border-top">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <i class="bi bi-person"></i> {{
+                project.advisor.get_full_name|default:"ไม่ระบุ" }}
+              </small>
+              <a
+                href="{% url 'final_pro:project_detail' project.pk %}"
+                class="btn btn-sm btn-primary"
+              >
+                ดูรายละเอียด <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-inbox display-1 text-muted"></i>
+    <p class="text-muted mt-3">ยังไม่มีโครงงานในระบบ</p>
+    <a href="{% url 'final_pro:project_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> สร้างโครงงานแรก
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="container my-5">
+  <h2 class="fw-bold mb-4"><i class="bi bi-lightning-charge"></i> เมนูด่วน</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card action-card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="bi bi-clipboard-check text-success"></i> แบบประเมิน
+          </h5>
+          <p class="card-text text-muted">
+            ดูและจัดการแบบประเมินโครงงาน (วท.ป.1 - วท.ป.5)
+          </p>
+          <a
+            href="{% url 'final_pro:evaluation_list' %}"
+            class="btn btn-success"
+          >
+            เข้าสู่หน้าแบบประเมิน <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card action-card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="bi bi-file-earmark-text text-warning"></i> แบบคำขอ
+          </h5>
+          <p class="card-text text-muted">
+            ดูและจัดการแบบคำขอต่างๆ (วท.1 - วท.14)
+          </p>
+          <a href="{% url 'final_pro:request_list' %}" class="btn btn-warning">
+            เข้าสู่หน้าแบบคำขอ <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

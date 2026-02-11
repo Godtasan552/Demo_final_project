@@ -1,0 +1,95 @@
+{% extends 'base.html' %} {% block title %}{{ title }}{% endblock %} {% block
+content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="fw-bold mb-4">
+            <i class="bi bi-clipboard-check text-success"></i> {{ title }}
+          </h3>
+
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>โครงงาน:</strong> {{ project.title_th }}
+          </div>
+
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="{{ form.form_type.id_for_label }}" class="form-label">
+                ประเภทแบบประเมิน <span class="text-danger">*</span>
+              </label>
+              {{ form.form_type }} {% if form.form_type.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.form_type.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.score.id_for_label }}" class="form-label">
+                คะแนน (0-100)
+              </label>
+              {{ form.score }} {% if form.score.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.score.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.strengths.id_for_label }}" class="form-label">
+                จุดเด่น
+              </label>
+              {{ form.strengths }} {% if form.strengths.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.strengths.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="{{ form.improvements.id_for_label }}"
+                class="form-label"
+              >
+                ข้อเสนอแนะในการพัฒนา
+              </label>
+              {{ form.improvements }} {% if form.improvements.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.improvements.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.comments.id_for_label }}" class="form-label">
+                ความเห็นเพิ่มเติม
+              </label>
+              {{ form.comments }} {% if form.comments.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.comments.errors }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> ส่งแบบประเมิน
+              </button>
+              <a
+                href="{% url 'final_pro:project_detail' project.pk %}"
+                class="btn btn-secondary"
+              >
+                <i class="bi bi-x-circle"></i> ยกเลิก
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

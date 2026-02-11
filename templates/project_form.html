@@ -1,0 +1,92 @@
+{% extends 'base.html' %} {% block title %}{{ title }}{% endblock %} {% block
+content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h3 class="fw-bold mb-4">
+            <i class="bi bi-folder-plus text-primary"></i> {{ title }}
+          </h3>
+
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="{{ form.title_th.id_for_label }}" class="form-label">
+                ชื่อโครงงาน (ภาษาไทย) <span class="text-danger">*</span>
+              </label>
+              {{ form.title_th }}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.title_en.id_for_label }}" class="form-label">
+                ชื่อโครงงาน (ภาษาอังกฤษ)
+              </label>
+              {{ form.title_en }}
+            </div>
+
+            <div class="mb-3">
+              <label
+                for="{{ form.description.id_for_label }}"
+                class="form-label"
+              >
+                รายละเอียด <span class="text-danger">*</span>
+              </label>
+              {{ form.description }}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.status.id_for_label }}" class="form-label">
+                  สถานะ
+                </label>
+                {{ form.status }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.advisor.id_for_label }}" class="form-label">
+                  อาจารย์ที่ปรึกษา
+                </label>
+                {{ form.advisor }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label
+                  for="{{ form.start_date.id_for_label }}"
+                  class="form-label"
+                >
+                  วันที่เริ่ม
+                </label>
+                {{ form.start_date }}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label
+                  for="{{ form.expected_completion.id_for_label }}"
+                  class="form-label"
+                >
+                  กำหนดเสร็จ
+                </label>
+                {{ form.expected_completion }}
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> บันทึก
+              </button>
+              <a
+                href="{% url 'final_pro:project_list' %}"
+                class="btn btn-secondary"
+              >
+                <i class="bi bi-x-circle"></i> ยกเลิก
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

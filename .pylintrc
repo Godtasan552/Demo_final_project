@@ -1,0 +1,28 @@
+[MESSAGES CONTROL]
+# Disable Django-specific false positives
+disable=
+    C0111,  # missing-docstring
+    R0903,  # too-few-public-methods (for models)
+    E1101,  # no-member (Django dynamic attributes)
+    
+[TYPECHECK]
+# Tell Pylint about Django's dynamic attributes
+generated-members=
+    objects,
+    DoesNotExist,
+    id,
+    pk,
+    _meta,
+    get_*_display,
+    save,
+    delete,
+    
+[BASIC]
+# Good variable names
+good-names=i,j,k,ex,Run,_,pk,id
+
+# Note: To use pylint-django plugin, install it first:
+# pip install pylint-django
+# Then uncomment the following line:
+# [MASTER]
+# load-plugins=pylint_django
