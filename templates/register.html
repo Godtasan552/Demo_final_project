@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}ลงทะเบียนนักศึกษาใหม่{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="mb-0"><i class="bi bi-person-plus-fill"></i> ลงทะเบียนนักศึกษาใหม่</h3>
+                    <p class="mb-0 small opacity-75">สร้างบัญชีผู้เพื่อเริ่มต้นใช้งานระบบ</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">ชื่อจริง</label>
+                                {{ form.first_name }}
+                                {{ form.first_name.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">นามสกุล</label>
+                                {{ form.last_name }}
+                                {{ form.last_name.errors }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">รหัสนักศึกษา / ชื่อผู้ใช้</label>
+                            {{ form.username }}
+                            <div class="form-text small">ใช้สำหรับเข้าสู่ระบบ</div>
+                            {{ form.username.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">ยืนยันรหัสนักศึกษา (Student ID)</label>
+                            {{ form.student_id }}
+                            {{ form.student_id.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">เบอร์โทรศัพท์</label>
+                            {{ form.phone }}
+                            {{ form.phone.errors }}
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">รหัสผ่าน</label>
+                                {{ form.password }}
+                                {{ form.password.errors }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">ยืนยันรหัสผ่าน</label>
+                                {{ form.confirm_password }}
+                                {{ form.confirm_password.errors }}
+                            </div>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary py-2 fw-bold">
+                                <i class="bi bi-check-circle-fill"></i> ลงทะเบียน
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <span class="text-muted">มีบัญชีอยู่แล้ว?</span> 
+                    <a href="{% url 'final_pro:login' %}" class="fw-bold text-primary">เข้าสู่ระบบที่นี่</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

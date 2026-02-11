@@ -1,5 +1,6 @@
 from django import forms
 from .models import Project, EvaluationForm, RequestForm, Submission
+from django.contrib.auth.models import User
 
 
 class ProjectForm(forms.ModelForm):
@@ -76,3 +77,34 @@ class SubmissionForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'รายละเอียด'}),
             'file': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+
+class StudentRegistrationForm(forms.ModelForm):
+    """Form for student self-registration"""
+    username = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'ชื่อผู้ใช้ (Student ID)'}))
+    password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'รหัสผ่าน'}))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': 'ยืนยันรหัสผ่าน'}))
+    first_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'ชื่อจริง'}))
+    last_name = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'นามสกุล'}))
+    student_id = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'รหัสนักศึกษา'}))
+    phone = forms.CharField(required=False, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'เบอร์โทรศัพท์'}))
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'password']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password != confirm_password:
+            raise forms.ValidationError("รหัสผ่านไม่ตรงกัน")
+        return cleaned_data

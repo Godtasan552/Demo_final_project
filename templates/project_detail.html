@@ -1,4 +1,19 @@
-{% extends 'base.html' %} {% block title %}{{ project.title_th }}{% endblock %}
+{% extends 'base.html' %} 
+{% load project_tags %}
+{% block title %}{{ project.title_th }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .workflow-stepper .step-item { flex: 1; }
+  .workflow-stepper .step-icon { 
+    transition: all 0.3s ease; 
+    border-width: 2px !important;
+  }
+  .workflow-stepper .step-icon.shadow {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2) !important;
+  }
+</style>
+{% endblock %}
 {% block content %}
 <div class="container">
   <!-- Project Header -->
@@ -52,67 +67,97 @@
         </div>
       </div>
 
-      <div class="mt-4 d-flex gap-2 mb-4">
-        <a
-          href="{% url 'final_pro:evaluation_create' project.pk %}"
-          class="btn btn-success"
-        >
-          <i class="bi bi-clipboard-check"></i> ส่งแบบประเมิน
-        </a>
-        <a
-          href="{% url 'final_pro:request_create' project.pk %}"
-          class="btn btn-warning"
-        >
-          <i class="bi bi-file-earmark-text"></i> ส่งแบบคำขอ
-        </a>
+      <hr>
+
+      <!-- Workflow Stepper -->
+      <div class="workflow-stepper mb-5 mt-4">
+        <div class="d-flex justify-content-between position-relative">
+          <div class="progress position-absolute top-50 start-0 translate-middle-y w-100" style="height: 2px; z-index: 0;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ current_step|add:"-1"|mul:33 }}%;" aria-valuenow="{{ current_step }}" aria-valuemin="1" aria-valuemax="4"></div>
+          </div>
+          {% for step in workflow %}
+          <div class="step-item text-center position-relative" style="z-index: 1; width: 80px;">
+            <div class="step-icon mx-auto rounded-circle d-flex align-items-center justify-content-center mb-2 
+              {% if current_step > step.id %}bg-success text-white{% elif current_step == step.id %}bg-primary text-white shadow{% else %}bg-light text-muted border{% endif %}"
+              style="width: 40px; height: 40px; font-weight: bold;">
+              {% if current_step > step.id %}<i class="bi bi-check-lg"></i>{% else %}{{ step.id }}{% endif %}
+            </div>
+            <div class="step-label small fw-bold {% if current_step == step.id %}text-primary{% elif current_step > step.id %}text-success{% else %}text-muted{% endif %}">
+              {{ step.name }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
-      <!-- Export Documents Section -->
-      <div class="border-top pt-4">
-        <h5 class="fw-bold mb-3 text-success">
-          <i class="bi bi-file-earmark-word"></i> พิมพ์เอกสาร (Auto-Generate)
-        </h5>
-        
-        <div class="row g-3">
-          {% if user.is_staff %}
-          <!-- Teacher Only: Evaluation Forms -->
-          <div class="col-md-12 mb-2">
-            <h6 class="text-muted small fw-bold">สำหรับอาจารย์ (แบบประเมิน)</h6>
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.1' %}" class="btn btn-outline-success w-100 text-start">
-              <i class="bi bi-download"></i> วท.ป.1 แบบประเมินกรอบโครงงาน
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.2' %}" class="btn btn-outline-success w-100 text-start">
-              <i class="bi bi-download"></i> วท.ป.2 แบบประเมินการสอบหัวข้อ
-            </a>
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.5' %}" class="btn btn-outline-success w-100 text-start">
-              <i class="bi bi-download"></i> วท.ป.5 แบบประเมินผลการสอบ
-            </a>
-          </div>
-          {% endif %}
+      <div class="row g-4">
+        <!-- Student Section (แบบคำขอ) -->
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-person-fill"></i> ส่วนของนักศึกษา (แบบคำขอ)</h5>
+              <p class="small text-muted mb-4">สถานะปัจจุบัน: <strong>{{ workflow|dictsort:"id"|get_item:current_step|default:"จบโครงงาน" }}</strong></p>
+              
+              <div class="d-grid gap-2 mb-4">
+                <a href="{% url 'final_pro:request_create' project.pk %}" class="btn btn-primary">
+                  <i class="bi bi-file-earmark-plus"></i> ส่งแบบคำขอ (แบบ วท.)
+                </a>
+              </div>
 
-          <!-- Student/General: Request & Reports -->
-          <div class="col-md-12 mt-3 mb-2">
-            <h6 class="text-muted small fw-bold">สำหรับนักศึกษา/ทั่วไป (แบบคำขอ/รายงาน)</h6>
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.รายงาน' %}" class="btn btn-outline-info w-100 text-start">
-              <i class="bi bi-download"></i> รายงานการตรวจสอบเนื้อหา (.docx)
-            </a>
+              <h6 class="small fw-bold text-muted mb-2">ดาวน์โหลดแบบฟอร์มเปล่าเพื่อกรอกส่ง:</h6>
+              <div class="list-group list-group-flush small">
+                <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.รายงาน' %}" class="list-group-item list-group-item-action border-0 bg-transparent px-0">
+                  <i class="bi bi-download text-info"></i> แบบรายงานการตรวจเนื้อหา (.docx)
+                </a>
+                <p class="small text-muted mt-2 fst-italic">* แบบคำขออื่นๆ (วท.1-14) อยู่ในโฟลเดอร์ "แบบคำขอ"</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <p class="small text-muted mt-3 mb-0">
-          * ระบบจะดึงข้อมูลโครงงานไปกรอกในไฟล์เทมเพลต (.docx) ให้โดยอัตโนมัติ
-        </p>
+        <!-- Advisor Section (แบบประเมิน) -->
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm {% if user.is_staff %}bg-success-subtle{% else %}bg-light text-muted opacity-75{% endif %}">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3 text-success"><i class="bi bi-shield-lock-fill"></i> ส่วนของอาจารย์ (แบบประเมิน)</h5>
+              {% if user.is_staff %}
+                <div class="d-grid gap-2 mb-4">
+                  <a href="{% url 'final_pro:evaluation_create' project.pk %}" class="btn btn-success">
+                    <i class="bi bi-clipboard-check"></i> ประเมินและอนุมัติ (แบบ วท.ป.)
+                  </a>
+                </div>
+                
+                <h6 class="small fw-bold text-muted mb-2">Auto-Generate (ประทับข้อมูลอัตโนมัติ):</h6>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.1' %}" class="btn btn-outline-success btn-sm w-100 text-start">
+                       วท.ป.1 ประเมินกรอบ
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.2' %}" class="btn btn-outline-success btn-sm w-100 text-start">
+                       วท.ป.2 ประเมินหัวข้อ
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a href="{% url 'final_pro:export_project_docx' project.pk 'วท.ป.5' %}" class="btn btn-outline-success btn-sm w-100 text-start">
+                       วท.ป.5 ประเมินสอบ
+                    </a>
+                  </div>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <i class="bi bi-lock fs-1 text-muted mb-2"></i>
+                  <p class="small mb-0">เฉพาะอาจารย์ที่เข้าระบบเท่านั้นที่จะสามารถส่งแบบประเมินได้</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
 
   <!-- Tabs -->
   <ul class="nav nav-tabs mb-4" role="tablist">
@@ -197,6 +242,12 @@
                 >
                   {{ req.get_status_display }}
                 </span>
+                {% if user.is_staff and req.status == 'pending' %}
+                <div class="mt-1 d-flex gap-1">
+                  <a href="{% url 'final_pro:request_status_update' req.pk 'approved' %}" class="btn btn-sm btn-success py-0 px-2" style="font-size: 0.75rem;">อนุมัติ</a>
+                  <a href="{% url 'final_pro:request_status_update' req.pk 'rejected' %}" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.75rem;">ปฏิเสธ</a>
+                </div>
+                {% endif %}
               </td>
               <td>{{ req.submitted_at|date:"d/m/Y H:i" }}</td>
             </tr>

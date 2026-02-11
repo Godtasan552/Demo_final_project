@@ -22,12 +22,17 @@ urlpatterns = [
          views.request_create, name='request_create'),
 
     # Authentication
+    path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
     # Export documents
     path('projects/<int:pk>/export/<str:form_type>/',
          views.export_project_docx, name='export_project_docx'),
+
+    # Request Actions
+    path('requests/<int:pk>/status/<str:status>/',
+         views.request_status_update, name='request_status_update'),
 
     # Success page
     path('success/', views.submission_success, name='submission_success'),
